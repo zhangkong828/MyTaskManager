@@ -1,0 +1,24 @@
+﻿<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>登录</title>
+</head>
+<body>
+    <form method="post">
+        Username
+        <input type="text" name="Username" />
+        <br />
+        Password
+        <input name="Password" type="password" />
+        <br />
+        Remember Me
+        <input name="RememberMe" type="checkbox" value="True" />
+        <br />
+        <input type="submit" value="Login" />
+    </form>
+    @if (Model.Errored)
+    {
+        <div id="errorBox" class="floatingError">用户名或密码错误</div>
+    }
+</body>
+</html>
