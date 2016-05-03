@@ -14,16 +14,16 @@ namespace ZK.TaskManager.HostServer.Modules
         {
             this.RequiresAuthentication();
             Get["/tasklist"] = _ => TaskList(_);
-            Get["/planlist"] = _ => PlanList(_);
+            Get["/joblist"] = _ => JobList(_);
         }
 
         public dynamic TaskList(dynamic _)
         {
             return View["tasklist"];
         }
-        public dynamic PlanList(dynamic _)
+        public dynamic JobList(dynamic _)
         {
-            return View["planlist"];
+            return View["joblist"];
         }
     }
 }

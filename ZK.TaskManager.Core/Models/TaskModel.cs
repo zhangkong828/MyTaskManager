@@ -14,12 +14,12 @@ namespace ZK.TaskManager.Core.Models
         /// <summary>
         /// 任务ID
         /// </summary>
-        public string TaskID { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// 任务名称
         /// </summary>
-        public string TaskName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 任务执行参数
@@ -104,6 +104,7 @@ namespace ZK.TaskManager.Core.Models
         /// </summary>
         public string Remark { get; set; }
 
+        public string Verson { get; set; }
     }
 
     /// <summary>

@@ -125,18 +125,18 @@ namespace ZK.TaskManager.Core.Task
             //验证是否正确的Cron表达式
             if (ValidExpression(taskUtil.CronExpressionString))
             {
-                IJobDetail job = new JobDetailImpl(taskUtil.TaskID, GetClassInfo(taskUtil.AssemblyName, taskUtil.NameSpaceAndClass));
+                IJobDetail job = new JobDetailImpl(taskUtil.Id, GetClassInfo(taskUtil.AssemblyName, taskUtil.NameSpaceAndClass));
                 CronTriggerImpl trigger = new CronTriggerImpl();
                 trigger.CronExpressionString = taskUtil.CronExpressionString;
-                trigger.Name = taskUtil.TaskID;
-                trigger.Description = taskUtil.TaskName;
+                trigger.Name = taskUtil.Id;
+                trigger.Description = taskUtil.Name;
                 //添加任务执行参数
                 job.JobDataMap.Add("TaskParam", taskUtil.TaskParam);
                 scheduler.ScheduleJob(job, trigger);
 
                 if (taskUtil.Status == Models.TaskStatus.STOP)
                 {
-                    JobKey jk = new JobKey(taskUtil.TaskID);
+                    JobKey jk = new JobKey(taskUtil.Id);
                     scheduler.PauseJob(jk);
                 }
                 else

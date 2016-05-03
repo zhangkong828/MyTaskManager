@@ -95,7 +95,7 @@
     <None Include="Views\LogCenter\tasklog.cshtml" />
     <None Include="Views\LogCenter\systemlog.cshtml" />
     <None Include="Views\ServerCenter\nodelist.cshtml" />
-    <None Include="Views\TaskCenter\planlist.cshtml" />
+    <None Include="Views\TaskCenter\joblist.cshtml" />
     <None Include="Views\TaskCenter\tasklist.cshtml" />
     <None Include="Views\_Layout1.cshtml" />
   </ItemGroup>
@@ -126,6 +126,7 @@
     <Content Include="Content\img\a4.jpg" />
     <Content Include="Content\img\a7.jpg" />
     <Content Include="Content\img\a8.jpg" />
+    <Content Include="Content\img\avatar.png" />
     <Content Include="Content\img\profile_small.jpg" />
     <Content Include="Content\js\bootstrap-table-zh-CN.min.js" />
     <Content Include="Content\js\bootstrap-table.min.js" />

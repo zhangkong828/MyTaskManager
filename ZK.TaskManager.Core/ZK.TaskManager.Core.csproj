@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Log\Log.cs" />
+    <Compile Include="Models\JobModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
     <Compile Include="Monitor\BaseMonitor.cs" />
     <Compile Include="Monitor\HeartBeatMonitor.cs" />

@@ -90,8 +90,8 @@ namespace ZK.TaskManager.Core.Task
             var list = new List<TaskModel>();
 
             var task = new TaskModel();
-            task.TaskID = "11111";
-            task.TaskName = "1111";
+            task.Id = "11111";
+            task.Name = "1111";
             task.CronExpressionString = "0/5 * * * * ?";
             task.TaskParam = "每5秒执行一次~~~";
             task.AssemblyName = "SayHelloPlug.dll";
