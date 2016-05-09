@@ -7,24 +7,75 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
     <title>系统日志</title>
-
     <link rel="shortcut icon" href="favicon.ico">
     <link href="~/content/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/content/css/font-awesome.min.css" rel="stylesheet" />
     <link href="~/content/css/bootstrap-table.min.css" rel="stylesheet" />
     <link href="~/content/css/style.css" rel="stylesheet" />
+    <style>
+        .detail-view td:hover {
+            background-color: #fff !important;
+        }
+    </style>
 </head>
 
 <body class="gray-bg">
-    <h2>系统日志</h2>
+    <div class="wrapper wrapper-content animated fadeIn">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h4>系统日志<small>(服务端，客户端系统级别日志...)</small></h4>
+                    </div>
+                    <div class="ibox-content">
+                        <table id="syslogTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
     <script src="~/content/js/jquery-2.2.3.min.js"></script>
     <script src="~/content/js/bootstrap.min.js"></script>
     <script src="~/content/js/bootstrap-table.min.js"></script>
     <script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
+    <script>
+        $(function () {
+            $('#syslogTable').bootstrapTable({
+                url: "/api/syslog",
+                pagination: true, //分页
+                singleSelect: false,
+                search: false, //显示搜索框
+                sidePagination: "server", //服务端处理分页
+                sortOrder: "desc",
+                pageSize: 20,
+                pageNumber: 1,
+                detailView: true,
+                showRefresh: true,
+                detailFormatter: detailformatter,
+                columns: [
+                        {
+                            title: 'Time',
+                            field: 'time',
+                            align: 'left',
+                            width: '15%'
+                        },
+                        {
+                            title: 'Message',
+                            field: 'msg',
+                            align: 'left'
+                        }
+                ]
+            });
+        });
+        function detailformatter(index, row) {
+            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger">ID：' + row.id + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Time：' + row.time + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Message：' + row.msg + '</a><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>Exception：</h4><p class=list-group-item-text>' + row.exMessage + '</p></a></div>';
+        }
+    </script>
 </body>
 
 </html>

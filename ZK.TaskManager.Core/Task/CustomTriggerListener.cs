@@ -27,7 +27,7 @@ namespace ZK.TaskManager.Core.Task
         /// <param name="context">上下文</param>
         public void TriggerFired(ITrigger trigger, IJobExecutionContext context)
         {
-            Console.WriteLine("开始");
+            //Console.WriteLine("开始");
         }
 
 
@@ -39,8 +39,7 @@ namespace ZK.TaskManager.Core.Task
         /// <returns></returns>
         public bool VetoJobExecution(ITrigger trigger, IJobExecutionContext context)
         {
-            //TaskHelper.UpdateRecentRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
-            Console.WriteLine("执行");
+            //Console.WriteLine("执行");
             return false;
         }
 
@@ -52,8 +51,7 @@ namespace ZK.TaskManager.Core.Task
         /// <param name="triggerInstructionCode"></param>
         public void TriggerComplete(ITrigger trigger, IJobExecutionContext context, SchedulerInstruction triggerInstructionCode)
         {
-            // TaskHelper.UpdateLastRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
-            Console.WriteLine("完成");
+            //Console.WriteLine("完成");
         }
 
         /// <summary>
@@ -62,7 +60,7 @@ namespace ZK.TaskManager.Core.Task
         /// <param name="trigger">触发器</param>
         public void TriggerMisfired(ITrigger trigger)
         {
-            Console.WriteLine("错过");
+            //Console.WriteLine("错过");
         }
     }
 }

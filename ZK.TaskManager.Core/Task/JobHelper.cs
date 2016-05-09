@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,60 +8,171 @@ using ZK.TaskManager.Core.Models;
 
 namespace ZK.TaskManager.Core.Task
 {
-    public class TaskHelper
+    public class JobHelper
     {
         private static string InsertSQL = @"INSERT INTO dbo.p_Task(TaskID,TaskName,TaskParam,CronExpressionString,Assembly,Class,Status,CronRemark,Remark,LastRunTime)
                             VALUES(@TaskID,@TaskName,@TaskParam,@CronExpressionString,@Assembly,@Class,@Status,@CronRemark,@Remark,@LastRunTime)";
 
         private static string UpdateSQL = @"UPDATE dbo.p_Task SET TaskName=@TaskName,TaskParam=@TaskParam,CronExpressionString=@CronExpressionString,Assembly=@Assembly,
                                 Class=@Class,CronRemark=@CronRemark,Remark=@Remark,LastRunTime=@LastRunTime WHERE TaskID=@TaskID";
+
+
+        public static void Init()
+        {
+            Quartz.InitScheduler();
+            Quartz.StartScheduler();
+        }
+
+
         /// <summary>
-        /// 获取指定id任务
+        /// 处理Job
         /// </summary>
-        /// <param name="TaskID">任务id</param>
-        /// <returns>任务数据</returns>
-        public static TaskModel GetById(string TaskID)
+        public static void Execute(MessageModel msg)
+        {
+            var job = new JobModel();
+            job.Id = DateTime.Now.Ticks.ToString();
+            job.Name = DateTime.Now.Ticks.ToString();
+            job.Cron = "0/5 * * * * ?";
+            job.Param = "";
+            var task = new TaskModel();
+            task.Id = "1";
+            task.Name = "SayHello";
+            task.TaskDirName = "SayHello";
+            task.Assembly = "SayHelloPlugin.dll";
+            task.NameSpaceAndClass = "SayHelloPlugin.SayHello";
+            job.Task = task;
+            job.Status = "start";
+
+            //var job = GetJob(msg.JobId);
+            if (job != null)
+            {
+                switch (job.Status)
+                {
+                    case "start":
+                        StartJob(job);
+                        break;
+                    case "delete":
+                        DeleteJob(job);
+                        break;
+                    case "pause":
+                        PauseJob(job);
+                        break;
+                    case "resume":
+                        ResumeJob(job);
+                        break;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 获取taskid获取task
+        /// </summary>
+        public static TaskModel GetTask(string taskid)
         {
             return new TaskModel();
         }
-
-
         /// <summary>
-        /// 添加新任务
+        /// 获取jobid获取job
         /// </summary>
-        public static void AddTask(TaskModel taskUtil)
+        public static JobModel GetJob(string jobid)
         {
-            Quartz.StartJob(taskUtil);
-            //SQLHelper.ExecuteNonQuery("DELETE FROM p_Task WHERE TaskID=@TaskID", new { TaskID = TaskID });
+            var job = new JobModel();
+            job.Task = GetTask(job.TaskId);
+            return job;
         }
 
         /// <summary>
-        /// 删除指定id任务
+        /// 启动Job
         /// </summary>
-        /// <param name="TaskID">任务id</param>
-        public static void DeleteById(string TaskID)
+        public static void StartJob(JobModel job)
         {
-            Quartz.DeleteJob(TaskID);
-            //SQLHelper.ExecuteNonQuery("DELETE FROM p_Task WHERE TaskID=@TaskID", new { TaskID = TaskID });
+            try
+            {
+                var taskdir = job.Task.TaskDirName;
+                if (Directory.Exists(taskdir))
+                {
+                    Quartz.StartJob(job);
+                }
+                else
+                {
+                    Log.JobLog(job.Id, "该任务不在插件目录下");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.JobLog(job.Id, "启动Job出现异常", ex);
+            }
         }
+
+        /// <summary>
+        /// 删除Job
+        /// </summary>
+        public static void DeleteJob(JobModel job)
+        {
+            try
+            {
+                Quartz.DeleteJob(job);
+            }
+            catch (Exception ex)
+            {
+
+                Log.JobLog(job.Id, "删除Job出现异常", ex);
+            }
+
+        }
+
+        /// <summary>
+        /// 暂停Job
+        /// </summary>
+        public static void PauseJob(JobModel job)
+        {
+            try
+            {
+                Quartz.PauseJob(job);
+            }
+            catch (Exception ex)
+            {
+                Log.JobLog(job.Id, "暂停Job出现异常", ex);
+            }
+
+        }
+
+        /// <summary>
+        /// 恢复Job
+        /// </summary>
+        public static void ResumeJob(JobModel job)
+        {
+            try
+            {
+                Quartz.ResumeJob(job);
+            }
+            catch (Exception ex)
+            {
+                Log.JobLog(job.Id, "恢复Job出现异常", ex);
+            }
+
+        }
+
 
         /// <summary>
         /// 更新任务运行状态
         /// </summary>
         /// <param name="TaskID">任务id</param>
         /// <param name="Status">任务状态</param>
-        public static void UpdateTaskStatus(string TaskID, Models.TaskStatus Status)
-        {
-            if (Status == Models.TaskStatus.RUN)
-            {
-                Quartz.ResumeJob(TaskID);
-            }
-            else if(Status == Models.TaskStatus.RUN)
-            {
-                Quartz.PauseJob(TaskID);
-            }
-            // SQLHelper.ExecuteNonQuery("UPDATE p_Task SET Status=@Status WHERE TaskID=@TaskID", new { TaskID = TaskID, Status = Status });
-        }
+        //public static void UpdateTaskStatus(string TaskID, Models.TaskStatus Status)
+        //{
+        //    if (Status == Models.TaskStatus.RUN)
+        //    {
+        //        Quartz.ResumeJob(TaskID);
+        //    }
+        //    else if (Status == Models.TaskStatus.RUN)
+        //    {
+        //        Quartz.PauseJob(TaskID);
+        //    }
+        //    // SQLHelper.ExecuteNonQuery("UPDATE p_Task SET Status=@Status WHERE TaskID=@TaskID", new { TaskID = TaskID, Status = Status });
+        //}
 
         /// <summary>
         /// 更新任务下次运行时间
@@ -90,12 +202,12 @@ namespace ZK.TaskManager.Core.Task
             var list = new List<TaskModel>();
 
             var task = new TaskModel();
-            task.Id = "11111";
-            task.Name = "1111";
-            task.CronExpressionString = "0/5 * * * * ?";
-            task.TaskParam = "每5秒执行一次~~~";
-            task.AssemblyName = "SayHelloPlug.dll";
-            task.NameSpaceAndClass = "SayHelloPlug.SayHello";
+            //task.Id = "11111";
+            //task.Name = "1111";
+            //task.CronExpressionString = "0/5 * * * * ?";
+            //task.TaskParam = "每5秒执行一次~~~";
+            //task.Assembly = "SayHelloPlug.dll";
+            //task.NameSpaceAndClass = "SayHelloPlug.SayHello";
 
             list.Add(task);
             return list;

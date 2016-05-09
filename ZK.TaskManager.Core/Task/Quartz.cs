@@ -54,13 +54,13 @@ namespace ZK.TaskManager.Core.Task
 
                         scheduler = factory.GetScheduler();
                         scheduler.Clear();
-                        // LogHelper.WriteLog("任务调度初始化成功！");
+                        Log.SysLog("节点：" + GlobalConfig.NodeID + "任务调度初始化成功！");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // LogHelper.WriteLog("任务调度初始化失败！", ex);
+                Log.SysLog("节点：" + GlobalConfig.NodeID + " 任务调度初始化失败！", ex);
             }
         }
 
@@ -94,102 +94,54 @@ namespace ZK.TaskManager.Core.Task
                     //        }
                     //    }
                     //}
-                    // LogHelper.WriteLog("任务调度启动成功！");
+                    Log.SysLog("节点：" + GlobalConfig.NodeID + " 任务调度启动成功！");
                 }
             }
             catch (Exception ex)
             {
-                //LogHelper.WriteLog("任务调度启动失败！", ex);
+                Log.SysLog("任务调度启动失败！", ex);
             }
         }
 
-        /// <summary>
-        /// 删除现有任务
-        /// </summary>
-        public static void DeleteJob(string TaskID)
-        {
-            JobKey jk = new JobKey(TaskID);
-            if (scheduler.CheckExists(jk))
-            {
-                //任务已经存在 则删除
-                scheduler.DeleteJob(jk);
-                // LogHelper.WriteLog(string.Format("任务“{0}”已经删除", JobKey));
-            }
-        }
+
 
         /// <summary>
         /// 启用任务
         /// </summary>
-        public static void StartJob(TaskModel taskUtil)
+        public static void StartJob(JobModel jobmodel)
         {
             //验证是否正确的Cron表达式
-            if (ValidExpression(taskUtil.CronExpressionString))
+            if (ValidExpression(jobmodel.Cron))
             {
-                IJobDetail job = new JobDetailImpl(taskUtil.Id, GetClassInfo(taskUtil.AssemblyName, taskUtil.NameSpaceAndClass));
+                IJobDetail job = new JobDetailImpl(jobmodel.Id, GetClassInfo(jobmodel.Id, jobmodel.Task.TaskDirName, jobmodel.Task.Assembly, jobmodel.Task.NameSpaceAndClass));
                 CronTriggerImpl trigger = new CronTriggerImpl();
-                trigger.CronExpressionString = taskUtil.CronExpressionString;
-                trigger.Name = taskUtil.Id;
-                trigger.Description = taskUtil.Name;
+                trigger.CronExpressionString = jobmodel.Cron;
+                trigger.Name = jobmodel.Id;
+                trigger.Description = jobmodel.Name;
                 //添加任务执行参数
-                job.JobDataMap.Add("TaskParam", taskUtil.TaskParam);
+                job.JobDataMap.Add("TaskParam", jobmodel.Param);
                 scheduler.ScheduleJob(job, trigger);
+                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已启动", jobmodel.Name));
 
-                if (taskUtil.Status == Models.TaskStatus.STOP)
+                //LogHelper.WriteLog(string.Format("任务“{0}”启动成功,未来5次运行时间如下:", taskUtil.TaskName));
+                List<DateTime> list = GetTaskeFireTime(jobmodel.Cron, 1);
+                foreach (var time in list)
                 {
-                    JobKey jk = new JobKey(taskUtil.Id);
-                    scheduler.PauseJob(jk);
+                    // LogHelper.WriteLog(time.ToString());
                 }
-                else
-                {
-                    //LogHelper.WriteLog(string.Format("任务“{0}”启动成功,未来5次运行时间如下:", taskUtil.TaskName));
-                    List<DateTime> list = GetTaskeFireTime(taskUtil.CronExpressionString, 1);
-                    foreach (var time in list)
-                    {
-                        // LogHelper.WriteLog(time.ToString());
-                    }
-                }
+
             }
             else
             {
-                throw new Exception(taskUtil.CronExpressionString + "不是正确的Cron表达式,无法启动该任务!");
+                Log.JobLog(jobmodel.Id, jobmodel.Cron + "不是正确的Cron表达式,无法启动该任务!");
             }
         }
 
-        /// <summary>
-        /// 暂停任务
-        /// </summary>
-        /// <param name="JobKey"></param>
-        public static void PauseJob(string TaskID)
-        {
-            JobKey jk = new JobKey(TaskID);
-            if (scheduler.CheckExists(jk))
-            {
-                //任务已经存在则暂停任务
-                scheduler.PauseJob(jk);
-
-                //LogHelper.WriteLog(string.Format("任务“{0}”已暂停", JobKey));
-            }
-        }
-        /// <summary>
-        /// 恢复暂停的任务
-        /// </summary>
-        /// <param name="JobKey">任务key</param>
-        public static void ResumeJob(string TaskID)
-        {
-            JobKey jk = new JobKey(TaskID);
-            if (scheduler.CheckExists(jk))
-            {
-                //任务已经存在则恢复运行任务
-                scheduler.ResumeJob(jk);
-                //LogHelper.WriteLog(string.Format("任务“{0}”已恢复运行", JobKey));
-            }
-        }
-
-        private static Type GetClassInfo(string assemblyName, string className)
+        private static Type GetClassInfo(string jobid, string dirname, string assemblyName, string className)
         {
             try
             {
-                var assemblyPath = FileHelper.GetAbsolutePath(GlobalConfig.TaskDllDir + assemblyName);
+                var assemblyPath = System.IO.Path.Combine(GlobalConfig.TaskPluginDir, dirname, assemblyName);
                 Assembly assembly = null;
                 if (!AssemblyDict.TryGetValue(assemblyPath, out assembly))
                 {
@@ -201,10 +153,55 @@ namespace ZK.TaskManager.Core.Task
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Log.JobLog(jobid, "Job在反射加载任务时出现异常", ex);
                 return null;
             }
         }
+
+        /// <summary>
+        /// 删除现有任务
+        /// </summary>
+        public static void DeleteJob(JobModel jobmodel)
+        {
+            JobKey jk = new JobKey(jobmodel.Id);
+            if (scheduler.CheckExists(jk))
+            {
+                //任务已经存在 则删除
+                scheduler.DeleteJob(jk);
+                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已删除", jobmodel.Name));
+            }
+        }
+        /// <summary>
+        /// 暂停任务
+        /// </summary>
+        /// <param name="JobKey"></param>
+        public static void PauseJob(JobModel jobmodel)
+        {
+            JobKey jk = new JobKey(jobmodel.Id);
+            if (scheduler.CheckExists(jk))
+            {
+                //任务已经存在则暂停任务
+                scheduler.PauseJob(jk);
+
+                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已暂停", jobmodel.Name));
+            }
+        }
+        /// <summary>
+        /// 恢复暂停的任务
+        /// </summary>
+        /// <param name="JobKey">任务key</param>
+        public static void ResumeJob(JobModel jobmodel)
+        {
+            JobKey jk = new JobKey(jobmodel.Id);
+            if (scheduler.CheckExists(jk))
+            {
+                //任务已经存在则恢复运行任务
+                scheduler.ResumeJob(jk);
+                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已恢复", jobmodel.Name));
+            }
+        }
+
+
 
         /// <summary>
         /// 校验字符串是否为正确的Cron表达式

@@ -42,7 +42,7 @@ namespace ZK.TaskManager.Core
                 }
                 catch (Exception ex)
                 {
-                    Log.SysError("", ex);
+                    Log.SysLog("", ex);
                 }
             }
         }

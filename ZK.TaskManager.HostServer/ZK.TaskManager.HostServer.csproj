@@ -70,6 +70,7 @@
     <Compile Include="CustomBootstrapper.cs" />
     <Compile Include="FormsUser.cs" />
     <Compile Include="FormsUserMapper.cs" />
+    <Compile Include="Modules\ApiModule.cs" />
     <Compile Include="Modules\FormsModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\IndexModule.cs" />
@@ -87,6 +88,10 @@
     <None Include="Content\fonts\fontawesome-webfont.woff" />
     <None Include="Content\fonts\fontawesome-webfont.woff2" />
     <None Include="Content\fonts\FontAwesome.otf" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Content\js\jquery-2.2.3.min.map" />
     <None Include="packages.config" />
     <None Include="Views\Forms\login.cshtml" />
@@ -100,6 +105,10 @@
     <None Include="Views\_Layout1.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ZK.TaskManager.Core\ZK.TaskManager.Core.csproj">
+      <Project>{03b99da3-58bf-427c-86a4-fef06acb5d80}</Project>
+      <Name>ZK.TaskManager.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ZK.TaskManager.Utility\ZK.TaskManager.Utility.csproj">
       <Project>{5be7ecc9-9d1d-4015-a336-7245ff83315c}</Project>
       <Name>ZK.TaskManager.Utility</Name>
@@ -120,6 +129,7 @@
     <Content Include="Content\css\patterns\shattered.png" />
     <Content Include="Content\css\style.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\img\a1.jpg" />
     <Content Include="Content\img\a2.jpg" />
     <Content Include="Content\img\a3.jpg" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,5 +28,26 @@ namespace ZK.TaskManager.Utility
             return encoding.GetString(bytes);
         }
 
+        #region Json 序列化 反序列化
+        /// <summary>
+        /// Json 序列化
+        /// </summary>
+        public static string JsonSerializer(object obj)
+        {
+            return JsonConvert.SerializeObject(obj);
+        }
+
+        /// <summary>
+        /// Json 反序列化
+        /// </summary>
+        public static T JsonDeserializer<T>(string jsonstr)
+        {
+            if (string.IsNullOrEmpty(jsonstr))
+            {
+                return default(T);
+            }
+            return JsonConvert.DeserializeObject<T>(jsonstr);
+        }
+        #endregion
     }
 }

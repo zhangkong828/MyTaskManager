@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ZK.TaskManager.Core\ZK.TaskManager.Core.csproj">
+      <Project>{03b99da3-58bf-427c-86a4-fef06acb5d80}</Project>
+      <Name>ZK.TaskManager.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ZK.TaskManager.Utility\ZK.TaskManager.Utility.csproj">
       <Project>{5be7ecc9-9d1d-4015-a336-7245ff83315c}</Project>
       <Name>ZK.TaskManager.Utility</Name>

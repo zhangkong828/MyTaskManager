@@ -1,0 +1,8 @@
+﻿{
+  "name": "Say Hello",
+  "verson": "0.0.1",
+  "author": "ZK",
+  "dirname": "SayHello",
+  "assembly": "SayHelloPlugin.dll",
+  "namespace": "SayHelloPlugin.SayHello"
+}

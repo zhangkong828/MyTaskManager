@@ -16,15 +16,68 @@
     <link href="~/content/css/font-awesome.min.css" rel="stylesheet" />
     <link href="~/content/css/bootstrap-table.min.css" rel="stylesheet" />
     <link href="~/content/css/style.css" rel="stylesheet" />
+    <style>
+        .detail-view td:hover{
+            background-color:#fff !important;
+        }
+    </style>
 </head>
 
 <body class="gray-bg">
-    <h2>任务管理</h2>
+    <div class="wrapper wrapper-content animated fadeIn">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h4>任务插件管理<small>(需先把插件dll传到节点plugin目录下)</small></h4>
+                    </div>
+                    <div class="ibox-content">
+                        <div  class="btn-group toolbar">
+                            <button type="button" class="btn btn-primary">
+                                <span class="fa fa-plus" aria-hidden="true"></span>新增插件
+                            </button>
+                        </div>
+                        <table id="nodelistTable" data-toggle="table"
+                               data-url="/api/tasklist"
+                               data-search="true"
+                               data-toolbar=".toolbar"
+                               data-show-refresh="true"
+                               data-detail-view="true"
+                               data-detail-formatter="detailformatter">
+                            <thead>
+                                <tr>
+                                    <th data-field="id">ID</th>
+                                    <th data-field="name">名称</th>
+                                    <th data-field="taskDirName">插件目录</th>
+                                    <th data-field="verson">版本</th>
+                                    <th data-field="createOn">创建时间</th>
+                                    <th data-field="action" data-formatter="actionFormatter">操作</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
     <script src="~/content/js/jquery-2.2.3.min.js"></script>
     <script src="~/content/js/bootstrap.min.js"></script>
     <script src="~/content/js/bootstrap-table.min.js"></script>
     <script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
+    <script>
+        function actionFormatter(value, row, index) {
+            return [
+                '<button type="button" class="btn btn-success btn-sm">编辑插件</button>&nbsp;<button type="button" class="btn btn-warning btn-sm">删除插件</button>'
+            ].join('');
+        }
+        function detailformatter(index, row) {
+            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>插件说明</h4><p class=list-group-item-text>' + row.remark + '</p></a><a href="javascript:;" class="list-group-item list-group-item-danger">插件参数：' + row.taskParamRemark + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">程序集：' + row.assembly + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">命名空间：' + row.nameSpaceAndClass + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">最后修改时间：' + row.modifyOn + '</a></div>';
+        }
+    </script>
 </body>
 
 </html>

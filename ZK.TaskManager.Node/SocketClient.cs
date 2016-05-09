@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ZK.TaskManager.Core;
 using ZK.TaskManager.Utility;
 
 namespace ZK.TaskManager.Node
@@ -44,7 +45,7 @@ namespace ZK.TaskManager.Node
         private static void Connect()
         {
             client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            SocketConnect:
+        SocketConnect:
             try
             {
                 //连接
@@ -58,13 +59,13 @@ namespace ZK.TaskManager.Node
             }
             iskeep = true;
             Console.WriteLine("已成功连接到服务端！");
+            GlobalConfig.NodeID = client.LocalEndPoint.ToString();
         }
 
         private static void Receive()
         {
             Task t = new Task(() =>
             {
-                Console.WriteLine("接收命令...");
                 while (true)
                 {
                     try
@@ -75,6 +76,7 @@ namespace ZK.TaskManager.Node
                         //把字节转换为字符串
                         string msg = System.Text.Encoding.UTF8.GetString(buffer, 0, num);
                         ProcessHandle.Execute(msg);
+
                     }
                     catch (Exception ex)
                     {
@@ -91,7 +93,7 @@ namespace ZK.TaskManager.Node
         public static void Send(string msg)
         {
             var b = FormatHelper.StringToBytes(msg);
-            SocketSend:
+        SocketSend:
             try
             {
                 client.Send(b);
