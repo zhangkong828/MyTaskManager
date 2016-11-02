@@ -1,124 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZK.TaskManager.Core.Models;
+using ZK.TaskManager.Core.Services;
 
 namespace ZK.TaskManager.Core.Task
 {
     public class JobHelper
     {
-        private static string InsertSQL = @"INSERT INTO dbo.p_Task(TaskID,TaskName,TaskParam,CronExpressionString,Assembly,Class,Status,CronRemark,Remark,LastRunTime)
-                            VALUES(@TaskID,@TaskName,@TaskParam,@CronExpressionString,@Assembly,@Class,@Status,@CronRemark,@Remark,@LastRunTime)";
-
-        private static string UpdateSQL = @"UPDATE dbo.p_Task SET TaskName=@TaskName,TaskParam=@TaskParam,CronExpressionString=@CronExpressionString,Assembly=@Assembly,
-                                Class=@Class,CronRemark=@CronRemark,Remark=@Remark,LastRunTime=@LastRunTime WHERE TaskID=@TaskID";
-
-
         public static void Init()
         {
-            Quartz.InitScheduler();
-            Quartz.StartScheduler();
-        }
-
-
-        /// <summary>
-        /// 处理Job
-        /// </summary>
-        public static void Execute(MessageModel msg)
-        {
-            var job = new JobModel();
-            job.Id = DateTime.Now.Ticks.ToString();
-            job.Name = DateTime.Now.Ticks.ToString();
-            job.Cron = "0/5 * * * * ?";
-            job.Param = "";
-            var task = new TaskModel();
-            task.Id = "1";
-            task.Name = "SayHello";
-            task.TaskDirName = "SayHello";
-            task.Assembly = "SayHelloPlugin.dll";
-            task.NameSpaceAndClass = "SayHelloPlugin.SayHello";
-            job.Task = task;
-            job.Status = "start";
-
-            //var job = GetJob(msg.JobId);
-            if (job != null)
+            try
             {
-                switch (job.Status)
-                {
-                    case "start":
-                        StartJob(job);
-                        break;
-                    case "delete":
-                        DeleteJob(job);
-                        break;
-                    case "pause":
-                        PauseJob(job);
-                        break;
-                    case "resume":
-                        ResumeJob(job);
-                        break;
-                }
+                Quartz.InitScheduler();
+                Log.SysLog("节点：" + GlobalConfig.NodeID + "初始化任务调度成功！");
+            }
+            catch (Exception ex)
+            {
+                Log.SysLog("节点：" + GlobalConfig.NodeID + " 初始化任务调度失败！", ex);
+            }
+            try
+            {
+                Quartz.StartScheduler();
+                Log.SysLog("节点：" + GlobalConfig.NodeID + " 启动成功！");
+            }
+            catch (Exception ex)
+            {
+                Log.SysLog("节点：" + GlobalConfig.NodeID + " 启动失败！", ex);
             }
         }
 
 
         /// <summary>
-        /// 获取taskid获取task
+        /// 获取当前job数量
         /// </summary>
-        public static TaskModel GetTask(string taskid)
+        public static int GetJobCount()
         {
-            return new TaskModel();
-        }
-        /// <summary>
-        /// 获取jobid获取job
-        /// </summary>
-        public static JobModel GetJob(string jobid)
-        {
-            var job = new JobModel();
-            job.Task = GetTask(job.TaskId);
-            return job;
+            try
+            {
+                return Quartz.GetCount();
+            }
+            catch (Exception ex)
+            {
+                Log.SysLog("节点：" + GlobalConfig.NodeID + " 获取当前job数量失败！", ex);
+                return 999;
+            }
+
         }
 
         /// <summary>
         /// 启动Job
         /// </summary>
-        public static void StartJob(JobModel job)
+        public static bool StartJob(JobModel job)
         {
             try
             {
+                if (job.Status.ToLower() != "none")
+                {
+                    Log.NodeLog(GlobalConfig.NodeID, ConsoleMsg(job, "不是【未开始】的任务，无法启动!"));
+                    return false;
+                }
                 var taskdir = job.Task.TaskDirName;
                 if (Directory.Exists(taskdir))
                 {
-                    Quartz.StartJob(job);
+                    if (Quartz.StartJob(job))
+                    {
+                        if (JobService.UpdateState(job.Id, "start"))
+                        {
+                            Log.NodeLog(GlobalConfig.NodeID, ConsoleMsg(job, "已启动!"));
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        Log.NodeLog(GlobalConfig.NodeID, ConsoleMsg(job, "不是正确的Cron表达式，无法启动!"));
+                    }
                 }
                 else
                 {
-                    Log.JobLog(job.Id, "该任务不在插件目录下");
+                    Log.NodeLog(GlobalConfig.NodeID, ConsoleMsg(job, "在插件目录下，无法找到该插件！"));
                 }
+                return false;
 
             }
             catch (Exception ex)
             {
-                Log.JobLog(job.Id, "启动Job出现异常", ex);
+                Log.NodeLog(GlobalConfig.NodeID, string.Format("任务“{0}”[{1}]启动异常！", job.Name, job.Id), ex);
+                return false;
             }
         }
 
         /// <summary>
         /// 删除Job
         /// </summary>
-        public static void DeleteJob(JobModel job)
+        public static bool DeleteJob(JobModel job)
         {
             try
             {
-                Quartz.DeleteJob(job);
+                if (Quartz.DeleteJob(job))
+                {
+                    if (JobService.Remove(job.Id))
+                    {
+                        Log.NodeLog(job.Id, string.Format("任务“{0}”已删除！", job.Name));
+                        return true;
+                    }
+                }
+                else
+                {
+                    Log.NodeLog(job.Id, string.Format("任务“{0}”删除失败！", job.Name));
+                }
+                return false;
             }
             catch (Exception ex)
             {
-
-                Log.JobLog(job.Id, "删除Job出现异常", ex);
+                Log.NodeLog(GlobalConfig.NodeID, "删除Job出现异常！", ex);
+                return false;
             }
 
         }
@@ -126,15 +122,34 @@ namespace ZK.TaskManager.Core.Task
         /// <summary>
         /// 暂停Job
         /// </summary>
-        public static void PauseJob(JobModel job)
+        public static bool PauseJob(JobModel job)
         {
             try
             {
-                Quartz.PauseJob(job);
+                if (job.Status.ToLower() != "start")
+                {
+
+                    Log.NodeLog(job.Id, string.Format("任务“{0}”[{1}]不是【运行中】的任务，无法暂停!", job.Name, job.Id));
+                    return false;
+                }
+                if (Quartz.PauseJob(job))
+                {
+                    if (JobService.UpdateState(job.Id, "pause"))
+                    {
+                        Log.NodeLog(job.Id, string.Format("任务“{0}”已暂停！", job.Name));
+                        return true;
+                    }
+                }
+                else
+                {
+                    Log.NodeLog(job.Id, string.Format("任务“{0}”暂停失败！", job.Name));
+                }
+                return false;
             }
             catch (Exception ex)
             {
-                Log.JobLog(job.Id, "暂停Job出现异常", ex);
+                Log.NodeLog(GlobalConfig.NodeID, "暂停Job出现异常！", ex);
+                return false;
             }
 
         }
@@ -142,19 +157,42 @@ namespace ZK.TaskManager.Core.Task
         /// <summary>
         /// 恢复Job
         /// </summary>
-        public static void ResumeJob(JobModel job)
+        public static bool ResumeJob(JobModel job)
         {
             try
             {
-                Quartz.ResumeJob(job);
+                if (job.Status.ToLower() != "pause")
+                {
+
+                    Log.NodeLog(job.Id, string.Format("任务“{0}”[{1}]不是【暂停中】的任务，无法恢复!", job.Name, job.Id));
+                    return false;
+                }
+                if (Quartz.ResumeJob(job))
+                {
+                    if (JobService.UpdateState(job.Id, "start"))
+                    {
+                        Log.NodeLog(job.Id, string.Format("任务“{0}”已恢复！", job.Name));
+                        return true;
+                    }
+                }
+                else
+                {
+                    Log.NodeLog(job.Id, string.Format("任务“{0}”恢复失败！", job.Name));
+                }
+                return false;
             }
             catch (Exception ex)
             {
-                Log.JobLog(job.Id, "恢复Job出现异常", ex);
+                Log.NodeLog(GlobalConfig.NodeID, "恢复Job出现异常！", ex);
+                return false;
             }
 
         }
 
+        public static string ConsoleMsg(JobModel job, string msg)
+        {
+            return string.Format("Id:[{0}],Name:[{1}],Output: {2}", job.Id, job.Name, msg);
+        }
 
         /// <summary>
         /// 更新任务运行状态

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZK.TaskManager.Utility;
 
 namespace ZK.TaskManager.Core
 {
@@ -18,6 +19,10 @@ namespace ZK.TaskManager.Core
         /// </summary>
         public static string NodeID;
         /// <summary>
+        /// 当前节点端口
+        /// </summary>
+        public static string Port;
+        /// <summary>
         /// 节点创建时间
         /// </summary>
         public static DateTime CreateOn;
@@ -26,30 +31,27 @@ namespace ZK.TaskManager.Core
         /// </summary>
         public static string DataBaseConnectString;
         /// <summary>
-        /// web平台地址
-        /// </summary>
-        public static string ManagerWebUrl;
-        /// <summary>
-        /// 任务插件根目录
+        /// 插件根目录
         /// </summary>
         public static string TaskPluginDir;
         /// <summary>
-        /// 任务插件 压缩目录
+        /// 插件 压缩目录
         /// </summary>
         public static string TaskPluginDirZip;
         /// <summary>
-        /// 任务插件 目录
+        /// 插件 解压缩目录
         /// </summary>
-        public static string TaskPluginDirDll;
+        public static string TaskPluginDirSrc;
 
         public static void InitConfig()
         {
+            Port = ConfigurationManager.AppSettings["Port"];
+            NodeID = CommonHelper.GetIP() + ":" + Port;
             CreateOn = DateTime.Now;
             //DataBaseConnectString = ConfigurationManager.ConnectionStrings[""].ConnectionString;
-            ManagerWebUrl = ConfigurationManager.AppSettings["WebManager"];
             TaskPluginDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["PluginDir"]);
-            //TaskPluginDirZip = Path.Combine(TaskPluginDir, "Zip");
-            //TaskPluginDirDll = Path.Combine(TaskPluginDir, "Dll");
+            TaskPluginDirZip = Path.Combine(TaskPluginDir, "Zip");
+            TaskPluginDirSrc = Path.Combine(TaskPluginDir, "Src");
         }
 
     }

@@ -1,0 +1,93 @@
+﻿@{
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> @ViewBag.Title</title>
+    <link href="/Content/css/bootstrap.css" rel="stylesheet" />
+    @RenderSection("headscript", false)
+    <link href="~/Content/css/style.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="wrap">
+        <!--导航栏开始-->
+        <nav class="navbar-inverse navbar-fixed-top navbar" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">主页</a>
+
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav navbar-left nav">
+
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                              zk                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/Account/LoginOut" tabindex="-1">安全退出</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                服务中心
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/ServerCenter/NodeList" tabindex="-1">节点列表</a></li>
+                               
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                任务中心
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/CommandCenter/TaskList" tabindex="-1">任务管理</a></li>
+                               
+                                <li><a href="/CommandCenter/JobList" tabindex="-1">调度计划</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                日志中心
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/LogCenter/SystemLog" tabindex="-1">系统日志</a></li>
+
+                                <li><a href="/LogCenter/NodeLog" tabindex="-1">节点日志</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!--导航栏结束-->
+        <div class="container" style="margin-top: 70px;">
+            @RenderBody()
+        </div>
+    </div>
+    <!--底部文件开始-->
+    @*<footer class="footer">
+            <div class="container">
+                <p class="pull-right">&copy;  </p>
+            </div>
+        </footer>*@
+    <script src="~/Content/js/jquery-2.2.3.min.js"></script>
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    @RenderSection("footscript", false)
+</body>
+</html>

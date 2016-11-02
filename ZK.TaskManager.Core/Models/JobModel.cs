@@ -17,10 +17,10 @@ namespace ZK.TaskManager.Core.Models
         public string Param { get; set; }
         public string NodeId { get; set; }
         /// <summary>
-        /// start  启动
-        /// delete  删除
-        /// pause  暂停
-        /// resume  恢复
+        /// none   未开始
+        /// start  运行中
+        /// stop  已结束
+        /// pause  暂停中
         /// </summary>
         public string Status { get; set; }
         public TaskModel Task { get; set; }

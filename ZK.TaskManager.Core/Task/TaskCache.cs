@@ -50,7 +50,7 @@ namespace ZK.TaskManager.Core.Task
         {
             var needToDown = new List<string>();
             //本地的dll
-            var taskDlls = Directory.GetDirectories(GlobalConfig.TaskPluginDirDll);
+            var taskDlls = Directory.GetDirectories(GlobalConfig.TaskPluginDirSrc);
             //检查是否存在
             foreach (var item in tasklist)
             {

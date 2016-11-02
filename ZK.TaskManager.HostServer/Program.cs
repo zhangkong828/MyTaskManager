@@ -18,6 +18,7 @@ namespace ZK.TaskManager.HostServer
     {
         static void Main(string[] args)
         {
+            AutoMapper.Init();
             //启动 后台管理站点
             var webmanager = ConfigurationManager.AppSettings["WebManager"];
             var Host = new NancyHost(new Uri(webmanager));
@@ -27,17 +28,19 @@ namespace ZK.TaskManager.HostServer
             SocketServer.Inti();
 
 
-            Task.Factory.StartNew(() =>
-            {
-                Thread.Sleep(5000);
-                var msg = new MessageModel();
-                msg.Id = "000001";
-                msg.JobId = "qwerasdfzxcv";
-                var json = FormatHelper.JsonSerializer(msg);
-                SocketServer.Send(json);
-            });
+            //Task.Factory.StartNew(() =>
+            //{
+            //    Thread.Sleep(5000);
+            //    var msg = new MessageModel();
+            //    msg.Id = "000001";
+            //    msg.JobId = "qwerasdfzxcv";
+            //    var json = FormatHelper.JsonSerializer(msg);
+            //    SocketServer.Send(json);
+            //});
 
             Console.Read();
         }
+
+
     }
 }

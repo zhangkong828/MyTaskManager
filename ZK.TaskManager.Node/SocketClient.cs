@@ -26,7 +26,7 @@ namespace ZK.TaskManager.Node
 
             Connect();
             Receive();
-            //相当于心跳 自动重连
+            //自动重连
             Task t = new Task(() =>
             {
                 while (true)
@@ -53,12 +53,12 @@ namespace ZK.TaskManager.Node
             }
             catch (Exception ex)
             {
-                Console.WriteLine("连接异常，尝试重新连接HostServer...");
+                Console.WriteLine("连接异常，尝试重新连接Broker...");
                 Thread.Sleep(2000);
                 goto SocketConnect;
             }
             iskeep = true;
-            Console.WriteLine("已成功连接到服务端！");
+            Console.WriteLine("已成功连接到Broker！");
             GlobalConfig.NodeID = client.LocalEndPoint.ToString();
         }
 
@@ -75,7 +75,7 @@ namespace ZK.TaskManager.Node
                         int num = client.Receive(buffer);
                         //把字节转换为字符串
                         string msg = System.Text.Encoding.UTF8.GetString(buffer, 0, num);
-                        ProcessHandle.Execute(msg);
+                        //ProcessHandle.Execute(msg);
 
                     }
                     catch (Exception ex)

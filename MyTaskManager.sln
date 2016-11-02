@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Web", "ZK.TaskManager.Web\ZK.TaskManager.Web.csproj", "{841F67EF-95E8-44A2-AEC1-3A8AD0B9C2DC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Utility", "ZK.TaskManager.Utility\ZK.TaskManager.Utility.csproj", "{5BE7ECC9-9D1D-4015-A336-7245FF83315C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Core", "ZK.TaskManager.Core\ZK.TaskManager.Core.csproj", "{03B99DA3-58BF-427C-86A4-FEF06ACB5D80}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{715433A1-E6A3-455E-8C0F-9388450BECFF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server(已弃用)", "Server(已弃用)", "{715433A1-E6A3-455E-8C0F-9388450BECFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{EE8392C1-942B-415E-9A67-2297E477CB7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.HostServer", "ZK.TaskManager.HostServer\ZK.TaskManager.HostServer.csproj", "{48B0F199-396A-4B32-B8D2-829C73C7F373}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.HostServer(已弃用)", "ZK.TaskManager.HostServer\ZK.TaskManager.HostServer(已弃用).csproj", "{48B0F199-396A-4B32-B8D2-829C73C7F373}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Node", "ZK.TaskManager.Node\ZK.TaskManager.Node.csproj", "{BC2F8C59-F0D3-4EDB-93A5-A4B82A0AA002}"
 EndProject
@@ -21,16 +19,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin", "Plugin", "{B3846F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayHelloPlugin", "SayHelloPlugin\SayHelloPlugin.csproj", "{1C4B1806-B462-4833-851F-205547D1DA5B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Broker", "Broker", "{76D48A1F-7A8C-4553-B63C-5BE3B6DAB6E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Web", "ZK.TaskManager.Web\ZK.TaskManager.Web.csproj", "{1F2256FD-71EA-4414-BF7C-EDF41DF81449}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZK.TaskManager.Broker", "ZK.TaskManager.Broker\ZK.TaskManager.Broker.csproj", "{F22A2F36-49CF-426B-BB0E-1C0F13322185}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{841F67EF-95E8-44A2-AEC1-3A8AD0B9C2DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{841F67EF-95E8-44A2-AEC1-3A8AD0B9C2DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{841F67EF-95E8-44A2-AEC1-3A8AD0B9C2DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{841F67EF-95E8-44A2-AEC1-3A8AD0B9C2DC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5BE7ECC9-9D1D-4015-A336-7245FF83315C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5BE7ECC9-9D1D-4015-A336-7245FF83315C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BE7ECC9-9D1D-4015-A336-7245FF83315C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +51,14 @@ Global
 		{1C4B1806-B462-4833-851F-205547D1DA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C4B1806-B462-4833-851F-205547D1DA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C4B1806-B462-4833-851F-205547D1DA5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F2256FD-71EA-4414-BF7C-EDF41DF81449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F2256FD-71EA-4414-BF7C-EDF41DF81449}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F2256FD-71EA-4414-BF7C-EDF41DF81449}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2256FD-71EA-4414-BF7C-EDF41DF81449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F22A2F36-49CF-426B-BB0E-1C0F13322185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F22A2F36-49CF-426B-BB0E-1C0F13322185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F22A2F36-49CF-426B-BB0E-1C0F13322185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F22A2F36-49CF-426B-BB0E-1C0F13322185}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,5 +67,6 @@ Global
 		{48B0F199-396A-4B32-B8D2-829C73C7F373} = {715433A1-E6A3-455E-8C0F-9388450BECFF}
 		{BC2F8C59-F0D3-4EDB-93A5-A4B82A0AA002} = {EE8392C1-942B-415E-9A67-2297E477CB7E}
 		{1C4B1806-B462-4833-851F-205547D1DA5B} = {B3846F57-A83C-4759-8A70-696AAB089349}
+		{F22A2F36-49CF-426B-BB0E-1C0F13322185} = {76D48A1F-7A8C-4553-B63C-5BE3B6DAB6E2}
 	EndGlobalSection
 EndGlobal

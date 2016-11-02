@@ -17,8 +17,8 @@
     <link href="~/content/css/bootstrap-table.min.css" rel="stylesheet" />
     <link href="~/content/css/style.css" rel="stylesheet" />
     <style>
-        .detail-view td:hover{
-            background-color:#fff !important;
+        .detail-view td:hover {
+            background-color: #fff !important;
         }
     </style>
 </head>
@@ -33,8 +33,8 @@
                         <h4>任务插件管理<small>(需先把插件dll传到节点plugin目录下)</small></h4>
                     </div>
                     <div class="ibox-content">
-                        <div  class="btn-group toolbar">
-                            <button type="button" class="btn btn-primary">
+                        <div class="btn-group toolbar">
+                            <button type="button" class="btn btn-primary add" v-on:click="Add">
                                 <span class="fa fa-plus" aria-hidden="true"></span>新增插件
                             </button>
                         </div>
@@ -52,7 +52,7 @@
                                     <th data-field="taskDirName">插件目录</th>
                                     <th data-field="verson">版本</th>
                                     <th data-field="createOn">创建时间</th>
-                                    <th data-field="action" data-formatter="actionFormatter">操作</th>
+                                    <th data-field="action" data-formatter="actionFormatter" data-events="operateEvents">操作</th>
                                 </tr>
                             </thead>
                         </table>
@@ -64,18 +64,178 @@
 
     </div>
 
+
+    <div id="mymodal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row form-horizontal">
+
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">插件ID</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="插件ID" v-model="id" disabled>
+                            </div>
+                            <label class="col-sm-2 control-label">插件名称</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="插件名称" v-model="name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">插件目录</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="插件目录" v-model="taskDirName">
+                            </div>
+                            <label class="col-sm-2 control-label">插件版本</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="插件版本" v-model="verson">
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">插件说明</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="2" placeholder="插件说明" v-model="remark"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">创建时间</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="格式：yyyy-MM-dd HH:mm:ss" v-model="createOn" disabled>
+                            </div>
+                            <label class="col-sm-2 control-label">最后修改时间</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="格式：yyyy-MM-dd HH:mm:ss" v-model="modifyOn" disabled>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">程序集</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="程序集" v-model="assembly">
+                            </div>
+                            <label class="col-sm-2 control-label">命名空间</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" placeholder="命名空间" v-model="nameSpaceAndClass">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <label class="col-sm-2 control-label">插件参数</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="2" placeholder="插件参数" v-model="taskParamRemark"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary save" v-on:click="Save" commond-type="{{commondtype}}">保存</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <script src="~/content/js/jquery-2.2.3.min.js"></script>
     <script src="~/content/js/bootstrap.min.js"></script>
     <script src="~/content/js/bootstrap-table.min.js"></script>
     <script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
+    <script src="~/content/js/vue.min.js"></script>
     <script>
+        var vm = null;
+        $(function () {
+            vm = new Vue({
+                el: '.gray-bg',
+                data: null,
+                methods: {
+                    Add: function () {
+                        Add();
+                    },
+                    Save: function () {
+                        Save();
+                    }
+                }
+            })
+        });
+        window.operateEvents = {
+            'click .edit': function (e, value, row, index) {
+                Edit(row);
+            },
+            'click .remove': function (e, value, row, index) {
+                alert('You click remove action, row: ' + JSON.stringify(row));
+            }
+        };
         function actionFormatter(value, row, index) {
             return [
-                '<button type="button" class="btn btn-success btn-sm">编辑插件</button>&nbsp;<button type="button" class="btn btn-warning btn-sm">删除插件</button>'
+                '<button type="button" class="btn btn-success btn-sm edit">编辑插件</button>&nbsp;<button type="button" class="btn btn-warning btn-sm remove">删除插件</button>'
             ].join('');
         }
         function detailformatter(index, row) {
             return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>插件说明</h4><p class=list-group-item-text>' + row.remark + '</p></a><a href="javascript:;" class="list-group-item list-group-item-danger">插件参数：' + row.taskParamRemark + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">程序集：' + row.assembly + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">命名空间：' + row.nameSpaceAndClass + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">最后修改时间：' + row.modifyOn + '</a></div>';
+        }
+        function Edit(data) {
+            vm.$set('id', data.id);
+            vm.$set('name', data.name);
+            vm.$set('taskParamRemark', data.taskParamRemark);
+            vm.$set('taskDirName', data.taskDirName);
+            vm.$set('assembly', data.assembly);
+            vm.$set('nameSpaceAndClass', data.nameSpaceAndClass);
+            vm.$set('createOn', data.createOn);
+            vm.$set('modifyOn', data.modifyOn);
+            vm.$set('remark', data.remark);
+            vm.$set('verson', data.verson);
+            vm.$set('modaltitle', '修改插件');
+            vm.$set('commondtype', 'edit');
+            $('#mymodal').modal('show');
+        }
+        function Add() {
+            vm.$set('id', null);
+            vm.$set('name', null);
+            vm.$set('taskParamRemark', null);
+            vm.$set('taskDirName', null);
+            vm.$set('assembly', null);
+            vm.$set('nameSpaceAndClass', null);
+            vm.$set('createOn', null);
+            vm.$set('modifyOn', null);
+            vm.$set('remark', null);
+            vm.$set('verson', null);
+            vm.$set('modaltitle', '添加插件');
+            vm.$set('commondtype', 'add');
+            $('#mymodal').modal('show');
+        }
+        function Save() {
+            var data = {
+                id: vm.id,
+                name: vm.name,
+                taskParamRemark: vm.taskParamRemark,
+                taskDirName: vm.taskDirName,
+                assembly: vm.assembly,
+                nameSpaceAndClass: vm.nameSpaceAndClass,
+                createOn: vm.createOn,
+                modifyOn: vm.modifyOn,
+                remark: vm.remark,
+                verson: vm.verson,
+            };
+            var url = '/api/task/';
+            url += vm.commondtype == 'add' ? 'add' : 'update'
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: data,
+                success: function (result) {
+                    if (result) {
+                        $('#nodelistTable').bootstrapTable('refresh');
+                    }
+                },
+                complete: function () {
+                    $('#mymodal').modal('hide')
+                }
+            });
         }
     </script>
 </body>

@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewBag.Title = "调度计划";
+    Layout = "~/Views/_MainLayoutPage.cshtml";
+}
+@section headscript{
+    <link href="~/content/css/bootstrap-table.min.css" rel="stylesheet" />
+}
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h4>调度计划</h4>
+            </div>
+            <div class="ibox-content">
+                <div class="btn-group toolbar">
+                </div>
+                <table id="joblistTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section footscript{
+<script src="~/content/js/bootstrap-table.min.js"></script>
+<script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
+<script>
+        $(function () {
+            $('#joblistTable').bootstrapTable({
+                url: "/api/joblist",
+                toolbar: '.toolbar',
+                pagination: true, //分页
+                singleSelect: false,
+                sidePagination: "server", //服务端处理分页
+                sortOrder: "desc",
+                pageSize: 20,
+                pageNumber: 1,
+                detailView: true,
+                showRefresh: true,
+                detailFormatter: detailformatter,
+                columns: [
+                        {
+                            title: 'Job',
+                            field: 'name',
+                            align: 'left'
+                        },
+                        {
+                            title: '所在节点',
+                            field: 'nodeId',
+                            align: 'left'
+                        },
+                        {
+                            title: 'Cron表达式',
+                            field: 'cron',
+                            align: 'left'
+                        },
+                        {
+                            title: 'Cron说明',
+                            field: 'cronRemark',
+                            align: 'left'
+                        },
+                        {
+                            title: '执行任务',
+                            field: 'taskName',
+                            align: 'left'
+                        },
+                        {
+                            title: '状态',
+                            field: 'status',
+                            align: 'left'
+                        },
+                        {
+                            title: '创建时间',
+                            field: 'createOn',
+                            align: 'left'
+                        },
+                        {
+                            title: '操作',
+                            align: 'left',
+                            formatter: function () {
+                                return [
+                   '<button type="button" class="btn btn-success btn-sm">暂停</button>&nbsp;<button type="button" class="btn btn-primary btn-sm">恢复</button>&nbsp;<button type="button" class="btn btn-danger btn-sm">删除</button>'
+                                ].join('');
+                            }
+                        }
+                ]
+            });
+        });
+        function detailformatter(index, row) {
+            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger">JobID：' + row.id + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">TaskID：' + row.taskId + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">说明：' + row.taskRemark + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">版本：' + row.taskVerson + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">参数：' + row.param + '</a><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>参数说明：</h4><p class=list-group-item-text>' + row.taskTaskParamRemark + '</p></a></div>';
+        }
+</script>
+}

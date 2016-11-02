@@ -24,44 +24,37 @@ namespace ZK.TaskManager.Core.Task
         /// </summary>
         private static Dictionary<string, Assembly> AssemblyDict = new Dictionary<string, Assembly>();
 
-        private static IScheduler scheduler = null;
+        public static IScheduler scheduler = null;
 
         /// <summary>
         /// 初始化任务调度对象
         /// </summary>
         public static void InitScheduler()
         {
-            try
+            lock (obj)
             {
-                lock (obj)
+                if (scheduler == null)
                 {
-                    if (scheduler == null)
-                    {
-                        NameValueCollection properties = new NameValueCollection();
+                    NameValueCollection properties = new NameValueCollection();
 
-                        properties["quartz.scheduler.instanceName"] = "QTaskManager";
+                    properties["quartz.scheduler.instanceName"] = "MyTaskManager";
 
-                        properties["quartz.threadPool.type"] = "Quartz.Simpl.SimpleThreadPool, Quartz";
+                    properties["quartz.threadPool.type"] = "Quartz.Simpl.SimpleThreadPool, Quartz";
 
-                        properties["quartz.threadPool.threadCount"] = "10";
+                    properties["quartz.threadPool.threadCount"] = "50";
 
-                        properties["quartz.threadPool.threadPriority"] = "Normal";
+                    properties["quartz.threadPool.threadPriority"] = "Normal";
 
-                        properties["quartz.jobStore.misfireThreshold"] = "60000";
+                    properties["quartz.jobStore.misfireThreshold"] = "60000";
 
+                    ISchedulerFactory factory = new StdSchedulerFactory(properties);
 
-                        ISchedulerFactory factory = new StdSchedulerFactory(properties);
+                    scheduler = factory.GetScheduler();
+                    scheduler.Clear();
 
-                        scheduler = factory.GetScheduler();
-                        scheduler.Clear();
-                        Log.SysLog("节点：" + GlobalConfig.NodeID + "任务调度初始化成功！");
-                    }
                 }
             }
-            catch (Exception ex)
-            {
-                Log.SysLog("节点：" + GlobalConfig.NodeID + " 任务调度初始化失败！", ex);
-            }
+
         }
 
         /// <summary>
@@ -70,37 +63,32 @@ namespace ZK.TaskManager.Core.Task
         /// </summary>
         public static void StartScheduler()
         {
-            try
-            {
-                if (!scheduler.IsStarted)
-                {
-                    //添加全局监听
-                    scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());
-                    scheduler.Start();
 
-                    ///获取所有执行中的任务
-                    //List<TaskUtil> listTask = TaskHelper.List();
-                    //if (listTask != null && listTask.Count > 0)
-                    //{
-                    //    foreach (TaskUtil taskUtil in listTask)
-                    //    {
-                    //        try
-                    //        {
-                    //            ScheduleJob(taskUtil);
-                    //        }
-                    //        catch (Exception e)
-                    //        {
-                    //            //LogHelper.WriteLog(string.Format("任务“{0}”启动失败！", taskUtil.TaskName), e);
-                    //        }
-                    //    }
-                    //}
-                    Log.SysLog("节点：" + GlobalConfig.NodeID + " 任务调度启动成功！");
-                }
-            }
-            catch (Exception ex)
+            if (!scheduler.IsStarted)
             {
-                Log.SysLog("任务调度启动失败！", ex);
+                //添加全局监听
+                scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());
+                scheduler.Start();
+
+                ///获取所有执行中的任务
+                //List<TaskUtil> listTask = TaskHelper.List();
+                //if (listTask != null && listTask.Count > 0)
+                //{
+                //    foreach (TaskUtil taskUtil in listTask)
+                //    {
+                //        try
+                //        {
+                //            ScheduleJob(taskUtil);
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            //LogHelper.WriteLog(string.Format("任务“{0}”启动失败！", taskUtil.TaskName), e);
+                //        }
+                //    }
+                //}
+
             }
+
         }
 
 
@@ -108,7 +96,7 @@ namespace ZK.TaskManager.Core.Task
         /// <summary>
         /// 启用任务
         /// </summary>
-        public static void StartJob(JobModel jobmodel)
+        public static bool StartJob(JobModel jobmodel)
         {
             //验证是否正确的Cron表达式
             if (ValidExpression(jobmodel.Cron))
@@ -121,19 +109,18 @@ namespace ZK.TaskManager.Core.Task
                 //添加任务执行参数
                 job.JobDataMap.Add("TaskParam", jobmodel.Param);
                 scheduler.ScheduleJob(job, trigger);
-                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已启动", jobmodel.Name));
 
                 //LogHelper.WriteLog(string.Format("任务“{0}”启动成功,未来5次运行时间如下:", taskUtil.TaskName));
-                List<DateTime> list = GetTaskeFireTime(jobmodel.Cron, 1);
-                foreach (var time in list)
-                {
-                    // LogHelper.WriteLog(time.ToString());
-                }
-
+                //List<DateTime> list = GetTaskeFireTime(jobmodel.Cron, 1);
+                //foreach (var time in list)
+                //{
+                //    // LogHelper.WriteLog(time.ToString());
+                //}
+                return true;
             }
             else
             {
-                Log.JobLog(jobmodel.Id, jobmodel.Cron + "不是正确的Cron表达式,无法启动该任务!");
+                return false;
             }
         }
 
@@ -141,7 +128,7 @@ namespace ZK.TaskManager.Core.Task
         {
             try
             {
-                var assemblyPath = System.IO.Path.Combine(GlobalConfig.TaskPluginDir, dirname, assemblyName);
+                var assemblyPath = System.IO.Path.Combine(GlobalConfig.TaskPluginDir, GlobalConfig.TaskPluginDirSrc,dirname, assemblyName);
                 Assembly assembly = null;
                 if (!AssemblyDict.TryGetValue(assemblyPath, out assembly))
                 {
@@ -153,7 +140,7 @@ namespace ZK.TaskManager.Core.Task
             }
             catch (Exception ex)
             {
-                Log.JobLog(jobid, "Job在反射加载任务时出现异常", ex);
+                Log.NodeLog(GlobalConfig.NodeID, "Job在反射加载任务时出现异常", ex);
                 return null;
             }
         }
@@ -161,44 +148,46 @@ namespace ZK.TaskManager.Core.Task
         /// <summary>
         /// 删除现有任务
         /// </summary>
-        public static void DeleteJob(JobModel jobmodel)
+        public static bool DeleteJob(JobModel jobmodel)
         {
             JobKey jk = new JobKey(jobmodel.Id);
             if (scheduler.CheckExists(jk))
             {
                 //任务已经存在 则删除
                 scheduler.DeleteJob(jk);
-                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已删除", jobmodel.Name));
+                return true;
             }
+            return false;
         }
         /// <summary>
         /// 暂停任务
         /// </summary>
         /// <param name="JobKey"></param>
-        public static void PauseJob(JobModel jobmodel)
+        public static bool PauseJob(JobModel jobmodel)
         {
             JobKey jk = new JobKey(jobmodel.Id);
             if (scheduler.CheckExists(jk))
             {
                 //任务已经存在则暂停任务
                 scheduler.PauseJob(jk);
-
-                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已暂停", jobmodel.Name));
+                return true;
             }
+            return false;
         }
         /// <summary>
         /// 恢复暂停的任务
         /// </summary>
         /// <param name="JobKey">任务key</param>
-        public static void ResumeJob(JobModel jobmodel)
+        public static bool ResumeJob(JobModel jobmodel)
         {
             JobKey jk = new JobKey(jobmodel.Id);
             if (scheduler.CheckExists(jk))
             {
                 //任务已经存在则恢复运行任务
                 scheduler.ResumeJob(jk);
-                Log.JobLog(jobmodel.Id, string.Format("任务“{0}”已恢复", jobmodel.Name));
+                return true;
             }
+            return false;
         }
 
 
@@ -235,5 +224,13 @@ namespace ZK.TaskManager.Core.Task
             }
             return list;
         }
+
+
+        public static int GetCount()
+        {
+            var jobkeys = scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+            return jobkeys.Count;
+        }
+
     }
 }

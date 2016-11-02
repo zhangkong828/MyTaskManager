@@ -23,15 +23,15 @@ namespace ZK.TaskManager.Core
 
 
         /// <summary>
-        /// 日志输出
+        /// 节点输出
         /// </summary>
-        public static void JobLog(string jobid, string msg)
+        public static void NodeLog(string nodeid, string msg)
         {
-            LogService.JobAdd(jobid, msg);
+            LogService.NodeAdd(nodeid, msg);
         }
-        public static void JobLog(string jobid, string msg, Exception ex)
+        public static void NodeLog(string nodeid, string msg, Exception ex)
         {
-            LogService.JobAdd(jobid, msg, ex);
+            LogService.NodeAdd(nodeid, msg, ex);
         }
     }
-}
+}   
