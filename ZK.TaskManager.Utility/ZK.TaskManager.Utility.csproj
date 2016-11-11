@@ -51,6 +51,7 @@
     <Compile Include="FormatHelper.cs" />
     <Compile Include="HttpHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestHelper.cs" />
     <Compile Include="SqlHelper.cs" />
   </ItemGroup>
   <ItemGroup>

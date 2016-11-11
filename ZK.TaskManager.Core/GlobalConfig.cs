@@ -19,9 +19,21 @@ namespace ZK.TaskManager.Core
         /// </summary>
         public static string NodeID;
         /// <summary>
+        /// 当前节点IP
+        /// </summary>
+        public static string NodeIP;
+        /// <summary>
         /// 当前节点端口
         /// </summary>
-        public static string Port;
+        public static int NodePort;
+        /// <summary>
+        /// 当前节点地址
+        /// </summary>
+        public static string NodeAddress;
+        /// <summary>
+        /// Consul地址
+        /// </summary>
+        public static string ConsulAddress;
         /// <summary>
         /// 节点创建时间
         /// </summary>
@@ -45,8 +57,16 @@ namespace ZK.TaskManager.Core
 
         public static void InitConfig()
         {
-            Port = ConfigurationManager.AppSettings["Port"];
-            NodeID = CommonHelper.GetIP() + ":" + Port;
+            NodeIP = CommonHelper.GetIP();
+            NodePort = Convert.ToInt32(ConfigurationManager.AppSettings["NodePort"]);
+            NodeAddress= $"http://{GlobalConfig.NodeIP}:{GlobalConfig.NodePort}";
+
+            // NodeID = ConfigurationManager.AppSettings["NodeID"];
+            NodeID = Guid.NewGuid().ToString("n");
+            ConsulAddress = ConfigurationManager.AppSettings["ConsulUrl"];
+            Environment.SetEnvironmentVariable("CONSUL_HTTP_ADDR", GlobalConfig.ConsulAddress);
+
+
             CreateOn = DateTime.Now;
             //DataBaseConnectString = ConfigurationManager.ConnectionStrings[""].ConnectionString;
             TaskPluginDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["PluginDir"]);

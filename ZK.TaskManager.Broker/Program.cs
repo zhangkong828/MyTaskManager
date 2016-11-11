@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ namespace ZK.TaskManager.Broker
     {
         static void Main(string[] args)
         {
-            var hosturl = "http://localhost:" + GlobalConfig.Port;
+            var port= ConfigurationManager.AppSettings["Port"];
+            var hosturl = "http://localhost:" + port;
             var config = new HttpSelfHostConfiguration(hosturl);
 
             config.Routes.MapHttpRoute(
@@ -25,7 +27,8 @@ namespace ZK.TaskManager.Broker
             server.OpenAsync().Wait();
 
             Console.WriteLine("Broker 已启动...");
-            SocketServer.Inti();
+
+            Console.Read();
         }
     }
 }

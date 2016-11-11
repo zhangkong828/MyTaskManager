@@ -43,6 +43,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Consul">
+      <HintPath>..\packages\Consul.0.7.0.3\lib\net45\Consul.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -111,10 +114,13 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CommandCenterController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LogCenterController.cs" />
     <Compile Include="Controllers\ServerCenterController.cs" />
+    <Compile Include="Core\NodeHost.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ServicesViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +136,8 @@
     <Content Include="Views\ServerCenter\NodeList.cshtml" />
     <Content Include="Views\CommandCenter\TaskList.cshtml" />
     <Content Include="Views\CommandCenter\JobList.cshtml" />
+    <Content Include="Views\LogCenter\SystemLog.cshtml" />
+    <Content Include="Views\LogCenter\NodeLog.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -139,7 +147,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZK.TaskManager.Core\ZK.TaskManager.Core.csproj">
+      <Project>{03B99DA3-58BF-427C-86A4-FEF06ACB5D80}</Project>
+      <Name>ZK.TaskManager.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

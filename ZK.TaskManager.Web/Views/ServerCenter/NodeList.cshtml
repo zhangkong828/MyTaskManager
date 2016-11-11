@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "节点列表";
+    ViewBag.Title = "Consul服务管理";
     Layout = "~/Views/_MainLayoutPage.cshtml";
 }
 @section headscript{
@@ -11,7 +11,7 @@
     <div class="col-sm-12">
         <div class="ibox">
             <div class="ibox-title">
-                <h4>节点管理 <small>所有连接到HostServer的节点</small></h4>
+                <h4>Consul服务管理 <small>每个节点将自身服务注册到Consul统一管理</small></h4>
             </div>
             <div class="ibox-content">
                 <table id="nodelistTable" data-toggle="table"
@@ -20,9 +20,13 @@
                        data-show-refresh="true">
                     <thead>
                         <tr>
-                            <th data-field="index">#</th>
-                            <th data-field="node">节点</th>
-                            <th data-field="action" data-formatter="actionFormatter">操作</th>
+                            <th data-field="index" data-align="center">#</th>
+                            @*<th data-field="Node" data-align="center">Node</th>*@
+                            <th data-field="ServiceId" data-align="center" data-width="280">Service ID</th>
+                            <th data-field="ServiceName" data-align="center" data-width="140">Service Name</th>
+                            <th data-field="ServiceIP" data-align="center" data-width="180">Service Address</th>
+                            <th data-field="ServiceState" data-align="center" data-formatter="ServiceStateFormatter" data-width="110">Service State</th>
+                            <th data-field="action" data-align="center" data-formatter="actionFormatter" data-events="operateEvents">操作</th>
                         </tr>
                     </thead>
                 </table>
@@ -36,10 +40,43 @@
     <script src="~/content/js/bootstrap-table.min.js"></script>
     <script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
     <script>
+        function ServiceStateFormatter(value, row, index) {
+            var state = '';
+            if (value != null) {
+                if (value == "passing") {
+                    state = '<span class="label label-success">' + value + '</span>';
+                } else {
+                    state = '<span class="label label-danger">' + value + '</span>';
+                }
+            } 
+            return state;
+        }
         function actionFormatter(value, row, index) {
             return [
-                '<button type="button" class="btn btn-warning btn-sm">查看日志</button>'
+                '&nbsp;&nbsp;<button type="button" class="btn btn-warning btn-sm logbtn">查看日志</button>',
+                '&nbsp;&nbsp;<button type="button" class="btn btn-info btn-sm unregisterbtn">注销服务</button>'
             ].join('');
         }
+        window.operateEvents = {
+            'click .logbtn': function (e, value, row, index) {
+                if (confirm("确定要删除该任务吗？")) {
+                    
+                }
+            },
+            'click .unregisterbtn': function (e, value, row, index) {
+                if (confirm("确定要注销该服务？")) {
+                    $.ajax({
+                        url: "/ServerCenter/UnRegisterService",
+                        type: "post",
+                        data: { sid: row.ServiceId },
+                        success: function (data) {
+                            if (data) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            }
+        };
     </script>
 }

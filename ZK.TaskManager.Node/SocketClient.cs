@@ -20,8 +20,8 @@ namespace ZK.TaskManager.Node
         public static bool iskeep;
         public static void Init()
         {
-            address = ConfigurationManager.AppSettings["Address"];
-            port = ConfigurationManager.AppSettings["Port"];
+            address = ConfigurationManager.AppSettings["BrokerAddress"];
+            port = ConfigurationManager.AppSettings["BrokerPort"];
             iskeep = false;
 
             Connect();
@@ -36,7 +36,7 @@ namespace ZK.TaskManager.Node
                         Connect();
                         Receive();
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
             });
             t.Start();
@@ -53,8 +53,8 @@ namespace ZK.TaskManager.Node
             }
             catch (Exception ex)
             {
-                Console.WriteLine("连接异常，尝试重新连接Broker...");
-                Thread.Sleep(2000);
+                Console.WriteLine("连接异常，3s后尝试重新连接Broker...");
+                Thread.Sleep(3000);
                 goto SocketConnect;
             }
             iskeep = true;

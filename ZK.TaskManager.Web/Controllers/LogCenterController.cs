@@ -6,15 +6,21 @@ using System.Web.Mvc;
 
 namespace ZK.TaskManager.Web.Controllers
 {
-    public class CommandCenterController : BaseController
+    public class LogCenterController : BaseController
     {
-       
-        public ActionResult TaskList()
+        
+        public ActionResult SystemLog()
         {
             return View();
         }
 
-        public ActionResult JobList()
+        [HttpPost]
+        public ActionResult GetSystemLog()
+        {
+            return View();
+        }
+
+        public ActionResult NodeLog()
         {
             return View();
         }

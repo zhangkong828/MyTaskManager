@@ -22,7 +22,7 @@ namespace ZK.TaskManager.Core
             }
             catch (Exception ex)
             {
-                Log.SysLog("", ex);
+                Log.SysLog("执行Job异常", ex);
             }
            
         }
