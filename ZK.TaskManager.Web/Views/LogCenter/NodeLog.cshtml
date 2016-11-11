@@ -4,5 +4,65 @@
     Layout = "~/Views/_MainLayoutPage.cshtml";
 }
 
-<h2>NodeLog</h2>
+@section headscript{
+    <link href="~/content/css/bootstrap-table.min.css" rel="stylesheet" />
+}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h4>节点调度日志<small>(任务信息,Job日志输出...)</small></h4>
+            </div>
+            <div class="ibox-content">
+                <div class="btn-group toolbar">
+                    <select class="form-control">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+                <table id="joblogTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
 
+@section footscript{
+    <script src="~/content/js/bootstrap-table.min.js"></script>
+    <script src="~/content/js/bootstrap-table-zh-cn.min.js"></script>
+    <script>
+        $(function () {
+            $('#joblogTable').bootstrapTable({
+                url: "/LogCenter/GetNodeLog",
+                toolbar: '.toolbar',
+                pagination: true, //分页
+                singleSelect: false,
+                sidePagination: "server", //服务端处理分页
+                sortOrder: "desc",
+                pageSize: 15,
+                pageNumber: 1,
+                detailView: true,
+                showRefresh: true,
+                detailFormatter: detailformatter,
+                columns: [
+                        {
+                            title: 'Time',
+                            field: 'time',
+                            align: 'left',
+                            width: '15%'
+                        },
+                        {
+                            title: 'Message',
+                            field: 'msg',
+                            align: 'left'
+                        }
+                ]
+            });
+        });
+        function detailformatter(index, row) {
+            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger">ID：' + row.id + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Time：' + row.time + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Message：' + row.msg + '</a><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>Exception：</h4><p class=list-group-item-text>' + row.exMessage + '</p></a></div>';
+        }
+</script>
+}

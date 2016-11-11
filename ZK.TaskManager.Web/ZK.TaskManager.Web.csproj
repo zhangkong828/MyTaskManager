@@ -153,6 +153,10 @@
       <Project>{03B99DA3-58BF-427C-86A4-FEF06ACB5D80}</Project>
       <Name>ZK.TaskManager.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ZK.TaskManager.Utility\ZK.TaskManager.Utility.csproj">
+      <Project>{5BE7ECC9-9D1D-4015-A336-7245FF83315C}</Project>
+      <Name>ZK.TaskManager.Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

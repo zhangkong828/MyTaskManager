@@ -14,11 +14,11 @@ namespace ZK.TaskManager.Web.Controllers
         {
             return View();
         }
-
+        [HttpPost]
         public ActionResult GetNodeList()
         {
             var nodes = NodeHost.Host.GetNodeList();
-            return Json(nodes, JsonRequestBehavior.AllowGet);
+            return Json(nodes, JsonRequestBehavior.DenyGet);
         }
 
         [HttpPost]

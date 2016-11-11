@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "SystemLog";
+    ViewBag.Title = "系统日志";
     Layout = "~/Views/_MainLayoutPage.cshtml";
 }
 
@@ -11,7 +11,7 @@
     <div class="col-sm-12">
         <div class="ibox">
             <div class="ibox-title">
-                <h4>系统日志<small>(服务端，客户端系统级别日志...)</small></h4>
+                <h4>系统日志<small></small></h4>
             </div>
             <div class="ibox-content">
                 <table id="syslogTable"></table>
@@ -31,7 +31,7 @@
                 search: false, //显示搜索框
                 sidePagination: "server", //服务端处理分页
                 sortOrder: "desc",
-                pageSize: 20,
+                pageSize: 15,
                 pageNumber: 1,
                 detailView: true,
                 showRefresh: true,
@@ -39,20 +39,20 @@
                 columns: [
                         {
                             title: 'Time',
-                            field: 'time',
+                            field: 'Time',
                             align: 'left',
                             width: '15%'
                         },
                         {
                             title: 'Message',
-                            field: 'msg',
+                            field: 'Msg',
                             align: 'left'
                         }
                 ]
             });
         });
         function detailformatter(index, row) {
-            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger">ID：' + row.id + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Time：' + row.time + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Message：' + row.msg + '</a><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>Exception：</h4><p class=list-group-item-text>' + row.exMessage + '</p></a></div>';
+            return '<div class=list-group><a href="javascript:;" class="list-group-item list-group-item-danger">ID：' + row.Id + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Time：' + row.Time + '</a><a href="javascript:;" class="list-group-item list-group-item-danger">Message：' + row.Msg + '</a><a href="javascript:;" class="list-group-item list-group-item-danger"><h4 class=list-group-item-heading>Exception：</h4><p class=list-group-item-text>' + row.Exception + '</p></a></div>';
         }
 </script>
 }
